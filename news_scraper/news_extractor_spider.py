@@ -9,6 +9,8 @@ from datetime import datetime
 import gzip
 from scrapy.selector import Selector
 import dateutil
+from config_urls import METADATA_URLS
+
 
 class NewsUrlExtractorSpider(scrapy.Spider):
     name = 'news_extractor'
@@ -20,83 +22,21 @@ class NewsUrlExtractorSpider(scrapy.Spider):
                                   'category', 'author', 'page-sitemap'
                                   'categories', 'video', 'image', 'temas',
 								                  'live', 'microsite', 'focus', 'blog',
-                                  'ocio', 'cine', 'board', 'character'}
+                                  'ocio', 'cine', 'board', 'character',
+                                  'galeria', 'categoria', 'ficha', 'firmante',
+                                  'secciones', 'hemeroteca', 'landing',
+                                  'sorteo', 'elecciones', 'autor', 'hilos', 'cartelera'}
+        self.metadata_urls = METADATA_URLS
 
-
-    # Lista de páginas web
-    start_urls=[
-        'https://www.elcomercio.es/',
-        'https://www.lne.es/',
-        'https://www.lavanguardia.com/',
-        'https://www.larazon.es/',
-        'https://www.rtpa.es/',
-        'https://www.europapress.es/',
-        'https://www.abc.es/',
-        'https://www.20minutos.es/',
-        'https://www.elperiodico.com/',
-        'https://www.eldiario.es/',
-        'https://www.elconfidencial.com/',
-        'https://www.culturalgijonesa.org/',
-        'https://www.elespanol.com/',
-        'https://www.nortes.me/',
-        'https://www.asturiasmundial.com/',
-        'https://www.tribunasalamanca.com/',
-        'https://migijon.com/',
-        'https://www.telecinco.es/',
-        'https://www.laprovincia.es/',
-        'https://www.laopiniondemalaga.es/',
-        'https://www.elfielato.es/',
-        'https://www.teleprensa.com/',
-        'https://www.infobae.com/',
-        'https://www.lavozdeasturias.es/', #newspaper
-        'https://cualia.es/', #newspaper
-        'https://www.lavozdegalicia.es/', # newspaper
-        'http://www.gentedigital.es/', #newspaper
-    ]
-
-    # Metadata: nombre y sitemap
-    metadata_urls={
-        'https://www.elcomercio.es/': {'nombre': 'El Comercio'},
-        'https://www.lne.es/': {'nombre': 'La Nueva España'},
-        'https://www.lavanguardia.com/': {'nombre': 'La Vanguardia',
-                                          'sitemap': 'sitemap-google-news.xml'},
-        'https://www.larazon.es/': {'nombre': 'La Razón'},
-        'https://www.rtpa.es/': {'nombre': 'Radiotelevisión del Principado de Asturias (RTPA)',
-                                 'sitemap': 'sitemap-noticias.xml'},
-        'https://www.europapress.es/': {'nombre': 'Europa Press'},
-        'https://www.abc.es/': {'nombre': 'ABC'},
-        'https://www.20minutos.es/': {'nombre': '20 Minutos',
-                                      'sitemap': 'sitemap-google-news.xml'},
-        'https://www.elperiodico.com/' : {'nombre': 'El Periódico',
-                                          'sitemap': 'google-news.xml'},
-        'https://www.eldiario.es/' : {'nombre': 'ElDiario.es'},
-        'https://www.lavozdeasturias.es/': {'nombre': 'La Voz de Asturias'}, #newspaper
-        'https://www.elconfidencial.com/': {'nombre': 'El Confidencial',
-                                            'sitemap': 'newsitemap_4.xml'},
-        'https://cualia.es/': {'nombre': 'Cualia'}, #newspaper
-        'https://www.culturalgijonesa.org/': {'nombre': 'Cultural Gijonesa'},
-        'https://www.elespanol.com/' : {'nombre': 'El Español',
-                                        'sitemap': 'sitemap_google_news.xml'},
-        'https://www.nortes.me/': {'nombre': 'Nortes'},
-        'https://www.lavozdegalicia.es/': {'nombre': 'La Voz de Galicia'},
-        'https://www.asturiasmundial.com/': {'nombre': 'Asturias Mundial'},
-        'https://www.tribunasalamanca.com/': {'nombre': 'Tribuna Salamanca'},
-        'https://migijon.com/': {'nombre': 'Mi Gijón'},
-        'http://www.gentedigital.es/' : {'nombre': 'Gente Digital'}, #newspaper
-        'https://www.infobae.com/' : {'nombre': 'Infobae',
-                                      'sitemap': 'arc/outboundfeeds/news-sitemap2/'},
-        'https://www.telecinco.es/' : {'nombre': 'Telecinco'},
-        'https://www.laprovincia.es/' : {'nombre': 'La Provincia'},
-        'https://www.laopiniondemalaga.es/': {'nombre': 'La Opinión de Málaga'},
-        'https://www.elfielato.es/': {'nombre': 'El Fielato y El Nora'},
-        'https://www.teleprensa.com/': {'nombre': 'Teleprensa'}
-    }
-
+    #metadata_urls = {
+    #    'https://fernandezrozas.com/': {'nombre': 'Blog de José Carlos Fernández Rozas'},
+    #}
 
     custom_settings = {
-        'USER_AGENT': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0"
+        'USER_AGENT': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:98.0) Gecko/20100101 Firefox/98.0",
+        #'DOWNLOAD_DELAY': 2,   # Agregar delay 0.5 segundos entre requests
+        #'RETRY_TIMES': 5       #
     }
-
 
     # Para extracción de xmls
     namespaces = {
@@ -116,7 +56,9 @@ class NewsUrlExtractorSpider(scrapy.Spider):
             #return parsed_date.strftime('%Y-%m-%d')
             return parsed_date.date()
         except (ValueError, TypeError):
-            raise ValueError(f"Formato de fecha inválido: '{date_string}'")
+            #raise ValueError(f"Formato de fecha inválido: '{date_string}'")
+            print(f"Formato de fecha inválido: '{date_string}'")
+            return None
 
     def is_valid_xml_url(self, sitemap_url):
         for invalid_word in self.invalid_url_words:
@@ -130,19 +72,46 @@ class NewsUrlExtractorSpider(scrapy.Spider):
         else:
             return True
 
+    def start_requests(self):
+        for url in self.metadata_urls:
+            #yield scrapy.Request(url=url, callback=self.parse, errback=lambda failure: self.handle_error(failure, url))
+            yield scrapy.Request(url=url, callback=self.parse)
+
+
+    def handle_error(self, failure, domain=None):
+        if failure and failure.value and failure.value.response:
+            print(f"Request fallida: {failure.value.response.status} para {failure.request.url}")
+        else:
+            print(f"Request fallida para {failure.request.url}")
+        print(f"Accediendo a enlaces con librería Newspaper...")
+        if domain is None:
+            domain = failure.request.url
+        yield from self.get_news_urls(domain)
+
+
     def parse(self, response):
         robots_url = urljoin(response.url, "/robots.txt")
         print(f'Robots URL: {robots_url}')
-        yield scrapy.Request(robots_url, callback=self.parse_robots, meta={'domain': response.url})
+        self.valid_robots = False
+        yield scrapy.Request(robots_url, callback=self.parse_robots,
+                             meta={'domain': response.url},
+                             errback=lambda failure: self.handle_error(failure, response.url))#self.get_base_url(response.url)))
+
+
+    def is_full_url(self, url):
+        parsed = urlparse(url)
+        return bool(parsed.scheme) and bool(parsed.netloc)
 
 
     def parse_robots(self, response):
         if response.status != 200:
-            print(f"Error al acceder a la url: {response.status}")
+            print(f"Error al acceder a la url: {response.status}.")
             return
+        self.valid_robots = True
 
         domain = response.meta['domain']
         domain_base = self.get_base_url(domain)
+
         current_sitemap_urls = set() #[]
 
         # Extraer urls de sitemaps de robots.txt
@@ -152,30 +121,42 @@ class NewsUrlExtractorSpider(scrapy.Spider):
                 parsed_url = urlparse(sitemap_url)
                 file_path = parsed_url.path
                 file_name, file_extension = os.path.splitext(file_path)
-                if file_extension.lower() == ".xml" and self.is_valid_xml_url(sitemap_url):
+                if self.is_valid_xml_url(sitemap_url):
                     current_sitemap_urls.add(sitemap_url)
 
         if len(current_sitemap_urls) > 0:
             print(f"Se encontraron los siguientes enlaces xml: {current_sitemap_urls}")
-            for sitemap_url in current_sitemap_urls:
+
+            for enum, sitemap_url in enumerate(current_sitemap_urls):
                 print(f"Accediendo al siguiente enlace... {sitemap_url}")
                 #yield scrapy.Request(sitemap_url, callback=self.parse_sitemap)  # Llamada recursiva
-                yield scrapy.Request(sitemap_url, callback=lambda response: self.parse_sitemap(response, domain) )
+                if enum == 0:
+                    yield scrapy.Request(sitemap_url,
+                                         callback=lambda response: self.parse_sitemap(response, domain),
+                                         errback=lambda failure: self.handle_error(failure, domain) )
+                else:
+                    yield scrapy.Request(sitemap_url, callback=lambda response: self.parse_sitemap(response, domain) )
 
         elif domain_base in self.metadata_urls and 'sitemap' in self.metadata_urls[domain_base]:
             print("No se encontraron enlaces xml en robots.txt.", end=" ")
-            sitemap_name = self.metadata_urls[domain_base]['sitemap']
-            #sitemap_name = self.sitemap_urls[domain]
-            sitemap_url = urljoin(domain_base, sitemap_name)
-            print(f"Accediendo al siguiente enlace especificado... {sitemap_url}")
-            #yield scrapy.Request(sitemap_url, callback=self.parse_sitemap)
-            yield scrapy.Request(sitemap_url, callback=lambda response: self.parse_sitemap(response, domain_base) )
+            sitemap_names = self.metadata_urls[domain_base]['sitemap']
+            if isinstance(sitemap_names, list):
+                for sitemap_name in sitemap_names:
+                    sitemap_url = urljoin(domain_base, sitemap_name)
+                    print(f"Accediendo al siguiente enlace especificado... {sitemap_url}")
+                    yield scrapy.Request(sitemap_url, callback=lambda response: self.parse_sitemap(response, domain_base) )
+            else:
+                sitemap_url = urljoin(domain_base, sitemap_names)
+                print(f"Accediendo al siguiente enlace especificado... {sitemap_url}")
+                #yield scrapy.Request(sitemap_url, callback=self.parse_sitemap)
+                yield scrapy.Request(sitemap_url,
+                                     callback=lambda response: self.parse_sitemap(response, domain_base),
+                                     errback=lambda failure: self.handle_error(failure, domain) )
         else:
             print("No se encontraron enlaces xml. Accediendo a enlaces con librería Newspaper...")
             # Si no se encuentra ningún mapa del sitio,
             # utilizar Newspaper4k para obtener las URL de los artículos de noticias
             yield from self.get_news_urls(domain)
-
 
 
     def parse_sitemap(self, response, domain=None):
@@ -190,13 +171,21 @@ class NewsUrlExtractorSpider(scrapy.Spider):
                 lastmod = self.normalize_date(last_mod)
                 if lastmod < self.from_date:
                     continue
+            #else:
+            #    continue
+
+            # Algunas sitemaps no contiene la url completa, agregar base_url
+            if not self.is_full_url(sitemap_loc):
+                sitemap_loc = urljoin(domain, sitemap_loc)
+
 
             # Verificar que la url es un archivo xml
             parsed_url = urlparse(sitemap_loc)
             file_path = parsed_url.path
             file_name, file_extension = os.path.splitext(file_path)
 
-            if file_extension.lower() == ".xml" and self.is_valid_xml_url(sitemap_loc):#'section' not in sitemap_loc:
+
+            if file_extension.lower() != '.gz' and self.is_valid_xml_url(sitemap_loc):#'section' not in sitemap_loc:
                 #print(f'Se encontró otro xml dentro del archivo actual: {sitemap_loc}') ## lots of outputs
                 if sitemap_loc:
                     #yield scrapy.Request(sitemap_loc, callback=self.parse_sitemap)  # Llamada recursiva
@@ -207,26 +196,48 @@ class NewsUrlExtractorSpider(scrapy.Spider):
                 yield scrapy.Request(sitemap_loc, callback=lambda response: self.parse_sitemap_gz(response, domain) )
 
 
-        # Extraer datos de cada tag <url>
-        for url in response.xpath('//ns:url', namespaces=self.namespaces):
 
+        # Verificar que el archivo tenga noticias recientes
+        selector_list = response.xpath('//ns:url', namespaces=self.namespaces)
+        if len(selector_list) > 1:
+            first_publication_date = selector_list[1].xpath('./news:news/news:publication_date/text()', namespaces=self.namespaces).get()
+            if first_publication_date is None:
+                first_publication_date = selector_list[1].xpath('./ns:lastmod/text()', namespaces=self.namespaces).get()
+
+            last_publication_date = selector_list[-1].xpath('./news:news/news:publication_date/text()', namespaces=self.namespaces).get()
+            if last_publication_date is None:
+                last_publication_date = selector_list[-1].xpath('./ns:lastmod/text()', namespaces=self.namespaces).get()
+
+            if first_publication_date and last_publication_date:
+                first_publication_date = self.normalize_date(first_publication_date)
+                last_publication_date = self.normalize_date(last_publication_date)
+                if first_publication_date < self.from_date and last_publication_date < self.from_date:
+                    return # No cumple con las fechas requeridas
+            else:
+                return # No se tienen fechas
+
+        # Extraer datos de cada tag <url>
+        for url in selector_list:
             loc = url.xpath('./ns:loc/text()', namespaces=self.namespaces).get()
             title = url.xpath('./news:news/news:title/text()', namespaces=self.namespaces).get()
             publication_date = url.xpath('./news:news/news:publication_date/text()', namespaces=self.namespaces).get()
             fuente = url.xpath('./news:news/news:publication/news:name/text()', namespaces=self.namespaces).get()
 
-            if loc is None:
+            if loc is None or not self.is_full_url(loc):
                 break
 
             title = "" if title is None else title
+
             if publication_date is None:
-               publication_date = url.xpath('./ns:lastmod/text()', namespaces=self.namespaces).get()
+                publication_date = url.xpath('./ns:lastmod/text()', namespaces=self.namespaces).get()
 
             if publication_date is not None:
                 publication_date_comp = self.normalize_date(publication_date)
-                #publication_date_ = dateutil.parser.parse(publication_date).date()
                 if publication_date_comp < self.from_date:
                     continue
+            else:
+                continue
+
 
             if domain is not None:
                 domain_base = self.get_base_url(domain)
@@ -240,13 +251,13 @@ class NewsUrlExtractorSpider(scrapy.Spider):
                 'fecha_publicacion': publication_date,
             }
 
-    def parse_sitemap_gz(self, response, domain=None):
 
+    def parse_sitemap_gz(self, response, domain=None):
         compressed_file = response.body
         decompressed_file = gzip.decompress(compressed_file).decode("utf-8")
         selector = Selector(text=decompressed_file, type="xml")
-        #yield from self.parse_sitemap(selector)
         yield from self.parse_sitemap(selector, domain)
+
 
     def get_news_urls(self, domain):
 
@@ -284,6 +295,7 @@ class NewsUrlExtractorSpider(scrapy.Spider):
             # Obtener fuente
             if domain is not None:
                 domain_base = self.get_base_url(domain)
+                #print(domain_base, ' ', domain_base in self.metadata_urls)
                 if domain_base in self.metadata_urls:
                     fuente = self.metadata_urls[domain_base]['nombre']
                 else:
