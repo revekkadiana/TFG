@@ -1,4 +1,5 @@
-
+# Ignorar archivos de datos (CSV)
+csv/
 # Ignorar caché de Python
 __pycache__/
 *.pyc
