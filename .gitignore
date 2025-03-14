@@ -1,5 +1,3 @@
-# Ignorar archivos de datos (CSV)
-data/
 
 # Ignorar caché de Python
 __pycache__/
@@ -11,5 +9,6 @@ scrapy.cfg
 
 # Ignorar notebooks de pruebas
 *.ipynb
+*.py
 # Pero NO ignorar buscador_articulos.ipynb
 !buscador_articulos.ipynb
