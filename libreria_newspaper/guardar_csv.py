@@ -1,7 +1,7 @@
 import os
 import csv
 
-def guardar_articulos_csv(articulos, hoy, carpeta_base='libreria_newspapery', subcarpeta='archivos'):
+def guardar_articulos_csv(articulos, hoy, carpeta_base='libreria_newspaper', subcarpeta='archivos'):
     # Construir la ruta completa
     carpeta_csv = os.path.join(carpeta_base, subcarpeta)
     
