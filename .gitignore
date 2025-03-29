@@ -11,5 +11,4 @@ scrapy.cfg
 # Ignorar notebooks de pruebas
 *.ipynb
 *.py
-# Pero NO ignorar buscador_articulos.ipynb
-!buscador_articulos.ipynb
+ç
