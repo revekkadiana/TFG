@@ -16,6 +16,6 @@ __pycache__/
 config_urls.py
 scrapy.cfg
 
-# Ignorar notebooks de pruebas en cualquier otra carpeta fuera de news_scraper
-*.ipynb
-*.py
+# # Ignorar notebooks de pruebas en cualquier otra carpeta fuera de news_scraper
+# *.ipynb
+# *.py
