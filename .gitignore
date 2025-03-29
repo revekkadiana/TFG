@@ -4,9 +4,6 @@
 # No ignorar la carpeta datasets y su contenido
 !news_scraper/datasets/
 
-# No ignorar .py y .ipynb en news_scraper/
-!news_scraper/news_scraper/*.py
-!news_scraper/news_scraper/*.ipynb
 
 # Ignorar caché de Python
 __pycache__/
