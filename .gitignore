@@ -1,6 +1,12 @@
-# Ignorar archivos CSV excepto los de news_scraper/datasets/
+# Ignorar todos los archivos CSV
 *.csv
+
+# No ignorar la carpeta datasets y su contenido
 !news_scraper/datasets/
+
+# No ignorar .py y .ipynb en news_scraper/
+!news_scraper/news_scraper/*.py
+!news_scraper/news_scraper/*.ipynb
 
 # Ignorar caché de Python
 __pycache__/
@@ -10,7 +16,6 @@ __pycache__/
 config_urls.py
 scrapy.cfg
 
-# Ignorar notebooks de pruebas
+# Ignorar notebooks de pruebas en cualquier otra carpeta fuera de news_scraper
 *.ipynb
 *.py
-!news_scraper/
